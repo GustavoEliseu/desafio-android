@@ -1,68 +1,139 @@
 package com.picpay.desafio.android
 
-import androidx.lifecycle.Lifecycle
-import androidx.test.core.app.launchActivity
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
-import okhttp3.mockwebserver.Dispatcher
+import com.picpay.desafio.android.RecyclerViewMatchers.checkRecyclerViewItem
+import com.picpay.desafio.android.modules.provideOkHttpClient
+import com.picpay.desafio.android.modules.providePicPayService
+import com.picpay.desafio.android.util.loadJSONFromAsset
+import junit.framework.TestCase.assertEquals
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
-class MainActivityTest {
-
-    private val server = MockWebServer()
-
+class MainActivityTest : KoinTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val server: MockWebServer = MockWebServer()
+    private val baseUrl = server.url("/").toString()
 
-    @Test
-    fun shouldDisplayTitle() {
-        launchActivity<MainActivity>().apply {
-            val expectedTitle = context.getString(R.string.title)
-
-            moveToState(Lifecycle.State.RESUMED)
-
-            onView(withText(expectedTitle)).check(matches(isDisplayed()))
+    val testModule = module {
+        single { provideOkHttpClient() }
+        single {
+            Retrofit.Builder()
+                .baseUrl(baseUrl)  // Use the server instance directly
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
         }
+        single { providePicPayService(get()) }
+    }
+
+    @Before
+    fun setup() {
+        loadKoinModules(testModule)
+
+        // Set up dispatcher
+    }
+
+    @After
+    fun tearDown() {
+        server.shutdown()
+        stopKoin()
     }
 
     @Test
     fun shouldDisplayListItem() {
-        server.dispatcher = object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse {
-                return when (request.path) {
-                    "/users" -> successResponse
-                    else -> errorResponse
-                }
-            }
-        }
+        server.enqueue(successResponse)
 
-        server.start(serverPort)
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+        checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
+        checkRecyclerViewItem(R.id.recyclerView,0, withText("Sandrine Spinka"))
+        onView(withId(R.id.recyclerView)).check( { view, noViewFoundException ->
+            val adapter = (view as? RecyclerView)?.adapter
+            val itemCount = adapter?.itemCount
 
-        launchActivity<MainActivity>().apply {
-            // TODO("validate if list displays items returned by server")
-        }
+            assertEquals("RecyclerView item count", 50, itemCount)
+        })
+    }
 
-        server.close()
+    @Test
+    fun shouldDisplayBrokenListItem() {
+        server.enqueue(brokenResponse)
+
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+        checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
+        checkRecyclerViewItem(R.id.recyclerView,1, withText("Carli Carroll"))
+    }
+
+    @Test
+    fun shouldNotDisplayListItem() {
+        server.enqueue(errorResponse)
+
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.recyclerView)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+    }
+
+    @Test
+    fun shouldDisplayEmptyListMessage() {
+        server.enqueue(emptySuccessResponse)
+        val emptytMessage = context.getString(R.string.empty_message)
+
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.recyclerView)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
+
+        onView(withText(emptytMessage)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun checkTitle() {
+        val expectedTitle = context.getString(R.string.title)
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withText(expectedTitle)).check(matches(isDisplayed()))
     }
 
     companion object {
-        private const val serverPort = 8080
-
         private val successResponse by lazy {
-            val body =
-                "[{\"id\":1001,\"name\":\"Eduardo Santos\",\"img\":\"https://randomuser.me/api/portraits/men/9.jpg\",\"username\":\"@eduardo.santos\"}]"
 
+            val body = loadJSONFromAsset("users.json")
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(body)
+        }
+        private val emptySuccessResponse by lazy{
+            val body = "[]"
             MockResponse()
                 .setResponseCode(200)
                 .setBody(body)
         }
 
-        private val errorResponse by lazy { MockResponse().setResponseCode(404) }
+        private val brokenResponse by lazy{
+            val body = loadJSONFromAsset("users-broken.json")
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(body)
+        }
+
+        private val errorResponse by lazy { MockResponse().setResponseCode(400) }
     }
 }

@@ -4,43 +4,30 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import org.junit.runner.RunWith
+import org.koin.android.ext.android.inject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+@RunWith(AndroidJUnit4::class)
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var adapter: UserListAdapter
+    private val service: PicPayService by inject()
 
-    private val url = "https://609a908e0f5a13001721b74e.mockapi.io/picpay/api/"
-
-    private val gson: Gson by lazy { GsonBuilder().create() }
-
-    private val okHttp: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .build()
-    }
-
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(url)
-            .client(okHttp)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-    }
-
-    private val service: PicPayService by lazy {
-        retrofit.create(PicPayService::class.java)
-    }
 
     override fun onResume() {
         super.onResume()
@@ -53,6 +40,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         progressBar.visibility = View.VISIBLE
+        lifecycleScope.launch {
         service.getUsers()
             .enqueue(object : Callback<List<User>> {
                 override fun onFailure(call: Call<List<User>>, t: Throwable) {
@@ -67,9 +55,22 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
                 override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                     progressBar.visibility = View.GONE
-
-                    adapter.users = response.body()!!
+                    val code = response.code()
+                    if(code == 200) {
+                        val body = response.body()
+                        if(body == null){
+                            adapter.users = listOf()
+                            recyclerView.visibility = View.GONE
+                        }else{
+                            adapter.users = body
+                        }
+                    } else{
+                        recyclerView.visibility = View.GONE
+                        Toast.makeText(this@MainActivity, "A requisição falhou com código: $code", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             })
+        }
     }
 }
