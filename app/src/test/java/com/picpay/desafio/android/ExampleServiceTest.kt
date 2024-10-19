@@ -1,5 +1,6 @@
 package com.picpay.desafio.android
 
+import com.picpay.desafio.android.model.User
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.mock

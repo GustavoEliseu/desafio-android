@@ -1,8 +1,8 @@
-package com.picpay.desafio.android.list
+package com.picpay.desafio.android.ui.main.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.picpay.desafio.android.User
+import com.picpay.desafio.android.model.User
 
 class UserListItemViewModel:
     ViewModel() {

@@ -1,8 +1,10 @@
-package com.picpay.desafio.android
+package com.picpay.desafio.android.ui.main.adapter
 
 import androidx.recyclerview.widget.RecyclerView
+import com.picpay.desafio.android.R
 import com.picpay.desafio.android.databinding.ListItemUserBinding
-import com.picpay.desafio.android.list.UserListItemViewModel
+import com.picpay.desafio.android.ui.main.viewmodel.UserListItemViewModel
+import com.picpay.desafio.android.model.User
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -11,10 +13,10 @@ class UserListItemViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     private val viewModel = UserListItemViewModel()
 
+
     fun bind(user: User) {
         binding.viewModel = viewModel
         viewModel.initialize(user)
-
         viewModel.progressVisible(true)
         Picasso.get()
             .load(user.img)

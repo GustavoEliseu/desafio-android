@@ -1,6 +1,7 @@
 package com.picpay.desafio.android
 
 import android.app.Application
+import com.picpay.desafio.android.di.viewModelModule
 import com.picpay.desafio.android.modules.provideOkHttpClient
 import com.picpay.desafio.android.modules.providePicPayService
 import okhttp3.mockwebserver.MockWebServer
@@ -32,7 +33,7 @@ class TestApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            modules(testModule)
+            modules(testModule, viewModelModule)
         }
     }
 }

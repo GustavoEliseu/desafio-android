@@ -3,7 +3,6 @@ package com.picpay.desafio.android
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -13,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.picpay.desafio.android.RecyclerViewMatchers.checkRecyclerViewItem
 import com.picpay.desafio.android.modules.provideOkHttpClient
 import com.picpay.desafio.android.modules.providePicPayService
+import com.picpay.desafio.android.ui.main.MainActivity
 import com.picpay.desafio.android.util.loadJSONFromAsset
 import junit.framework.TestCase.assertEquals
 import okhttp3.mockwebserver.MockResponse
@@ -21,7 +21,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.koin.core.context.loadKoinModules
-import org.koin.core.context.stopKoin
+import org.koin.core.context.unloadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import retrofit2.Retrofit
@@ -30,14 +30,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivityTest : KoinTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val server: MockWebServer = MockWebServer()
-    private val baseUrl = server.url("/").toString()
+    private lateinit var server: MockWebServer
+    private lateinit var baseUrl:String
 
     val testModule = module {
         single { provideOkHttpClient() }
         single {
             Retrofit.Builder()
-                .baseUrl(baseUrl)  // Use the server instance directly
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
@@ -46,15 +46,16 @@ class MainActivityTest : KoinTest {
 
     @Before
     fun setup() {
+        server = MockWebServer()
+        server.start(8080)
+        baseUrl = server.url("/").toString()
         loadKoinModules(testModule)
-
-        // Set up dispatcher
     }
 
     @After
     fun tearDown() {
         server.shutdown()
-        stopKoin()
+        unloadKoinModules(testModule)
     }
 
     @Test
@@ -70,6 +71,7 @@ class MainActivityTest : KoinTest {
 
             assertEquals("RecyclerView item count", 50, itemCount)
         })
+        scenario.close()
     }
 
     @Test
@@ -79,6 +81,7 @@ class MainActivityTest : KoinTest {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
         checkRecyclerViewItem(R.id.recyclerView,1, withText("Carli Carroll"))
+        scenario.close()
     }
 
     @Test
@@ -90,18 +93,20 @@ class MainActivityTest : KoinTest {
         onView(withId(R.id.recyclerView)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
             )
         )
+        scenario.close()
     }
 
     @Test
     fun shouldDisplayEmptyListMessage() {
         server.enqueue(emptySuccessResponse)
-        val emptytMessage = context.getString(R.string.empty_message)
+        val emptyMessage = context.getString(R.string.empty_message)
 
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
         onView(withId(R.id.recyclerView)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
 
-        onView(withText(emptytMessage)).check(matches(isDisplayed()))
+        onView(withText(emptyMessage)).check(matches(isDisplayed()))
+        scenario.close()
     }
 
     @Test
@@ -110,6 +115,7 @@ class MainActivityTest : KoinTest {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
         onView(withText(expectedTitle)).check(matches(isDisplayed()))
+        scenario.close()
     }
 
     companion object {

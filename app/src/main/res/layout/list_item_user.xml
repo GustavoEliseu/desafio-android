@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.picpay.desafio.android.list.UserListItemViewModel" />
+            type="com.picpay.desafio.android.ui.main.viewmodel.UserListItemViewModel" />
 
         <import type="android.view.View" />
     </data>
