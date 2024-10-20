@@ -1,16 +1,9 @@
 package com.picpay.desafio.android.ui.main
 
-import android.os.Build
-import android.os.Build.VERSION
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.SavedState
-import com.google.android.material.appbar.AppBarLayout
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.databinding.ActivityMainBinding
 import com.picpay.desafio.android.ui.main.viewmodel.MainViewModel
@@ -19,19 +12,17 @@ import org.koin.android.ext.android.inject
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by inject()
     private lateinit var binding :ActivityMainBinding
+    private var recyclerViewState: Parcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        /*Ao utilizar versões recentes do recyclerView, não é necessário lidar com savedInstanceState
-            apenas remover o nestedScroll que atrapalhava e adicionar chaves ao adapter(ver no viewmodel)
-         */
         super.onCreate(savedInstanceState)
-        viewModel.adapter.setNewTitle(getString(R.string.title))
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         setContentView(binding.root)
         if (savedInstanceState != null) {
             viewModel.setRecreateState()
+            recyclerViewState = savedInstanceState.getParcelable("recycler_view_state")
         }else{
             viewModel.initialize()
         }
@@ -52,8 +43,16 @@ class MainActivity : AppCompatActivity() {
                 is MainViewModel.MainViewState.Empty ->{ viewModel.updateUsers()}
                 else -> {
                     viewModel.updateUsers(recreated = true)
+                    recyclerViewState?.let {
+                        binding.recyclerView.layoutManager?.onRestoreInstanceState(it)
+                    }
                 }
             }
         }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val state = binding.recyclerView.layoutManager?.onSaveInstanceState()
+        outState.putParcelable("recycler_view_state", state)
     }
 }

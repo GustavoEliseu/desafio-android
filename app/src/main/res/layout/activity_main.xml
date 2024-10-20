@@ -10,24 +10,52 @@
 
         <import type="android.view.View" />
     </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        tools:context=".ui.main.MainActivity">
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
-            android:layout_height="wrap_content">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsingToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll|enterAlways">
+
+                <TextView
+                    android:id="@+id/title"
+                    style="@style/ScreenTitleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:text="@string/title"
+                    app:layout_collapseMode="parallax" />
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{viewModel.mutableRecyclerVisibility ? View.VISIBLE : View.GONE}"
                 android:adapter="@{viewModel.adapter}"
-                android:visibility="visible"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:listitem="@layout/list_item_user" />
 
             <TextView
@@ -35,29 +63,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/empty_message"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:textColor="@android:color/white"
-                android:visibility="@{viewModel.mutableMessageVisibility ? View.VISIBLE: View.GONE}"
-                app:layout_constraintVertical_bias="0.3"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recyclerView"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:layout_gravity="center"
+                android:visibility="@{viewModel.mutableMessageVisibility ? View.VISIBLE: View.GONE}" />
 
             <ProgressBar
                 android:id="@+id/user_list_progress_bar"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:visibility="@{viewModel.mutableLoadingVisibility ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/recyclerView"
-                app:layout_constraintStart_toStartOf="@+id/recyclerView"
-                app:layout_constraintTop_toTopOf="@+id/recyclerView"
-                app:layout_constraintVertical_bias="0.3" />
+                android:layout_gravity="center"
+                android:visibility="@{viewModel.mutableLoadingVisibility ? View.VISIBLE : View.GONE}" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </layout>
+        </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
