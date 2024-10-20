@@ -1,5 +1,7 @@
 package com.picpay.desafio.android.ui.main.adapter
 
+import android.view.View
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.databinding.ListItemUserBinding
@@ -16,6 +18,9 @@ class UserListItemViewHolder(
 
     fun bind(user: User) {
         binding.viewModel = viewModel
+        viewModel.mutableProgressVisibility.observe(binding.root.context as LifecycleOwner) { isVisible ->
+            binding.progressBar.visibility = if (isVisible) View.VISIBLE else View.GONE
+        }
         viewModel.initialize(user)
         viewModel.progressVisible(true)
         Picasso.get()
@@ -25,12 +30,10 @@ class UserListItemViewHolder(
             .into(binding.picture, object : Callback {
                 override fun onSuccess() {
                     viewModel.progressVisible(false)
-                    binding.executePendingBindings()
                 }
 
                 override fun onError(e: Exception?) {
                     viewModel.progressVisible(false)
-                    binding.executePendingBindings()
                 }
             })
     }

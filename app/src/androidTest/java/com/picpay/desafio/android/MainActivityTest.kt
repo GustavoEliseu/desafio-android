@@ -64,12 +64,13 @@ class MainActivityTest : KoinTest {
 
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
-        checkRecyclerViewItem(R.id.recyclerView,0, withText("Sandrine Spinka"))
+        checkRecyclerViewItem(R.id.recyclerView,0, withText("Contatos"))
+        checkRecyclerViewItem(R.id.recyclerView,1, withText("Sandrine Spinka"))
         onView(withId(R.id.recyclerView)).check( { view, noViewFoundException ->
             val adapter = (view as? RecyclerView)?.adapter
             val itemCount = adapter?.itemCount
 
-            assertEquals("RecyclerView item count", 50, itemCount)
+            assertEquals("RecyclerView item count", 51, itemCount)
         })
         scenario.close()
     }
@@ -79,8 +80,8 @@ class MainActivityTest : KoinTest {
         server.enqueue(brokenResponse)
 
         val scenario = ActivityScenario.launch(MainActivity::class.java)
-        checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
-        checkRecyclerViewItem(R.id.recyclerView,1, withText("Carli Carroll"))
+        checkRecyclerViewItem(R.id.recyclerView,1,isDisplayed())
+        checkRecyclerViewItem(R.id.recyclerView,2, withText("Carli Carroll"))
         scenario.close()
     }
 
@@ -113,8 +114,7 @@ class MainActivityTest : KoinTest {
     fun checkTitle() {
         val expectedTitle = context.getString(R.string.title)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
-
-        onView(withText(expectedTitle)).check(matches(isDisplayed()))
+        checkRecyclerViewItem(R.id.recyclerView,0, withText(expectedTitle))
         scenario.close()
     }
 

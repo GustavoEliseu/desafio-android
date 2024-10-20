@@ -10,32 +10,11 @@
 
         <import type="android.view.View" />
     </data>
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
-    tools:context=".ui.main.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/title"
-            style="@style/ScreenTitleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="48dp"
-            android:text="@string/title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:background="@color/colorPrimaryDark"
             android:layout_height="wrap_content">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -43,10 +22,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adapter="@{viewModel.adapter}"
+                android:visibility="visible"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:visibility="@{viewModel.mutableRecyclerVisibility ? View.VISIBLE : View.GONE}"
-                android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:listitem="@layout/list_item_user" />
@@ -56,12 +35,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/empty_message"
-                android:layout_marginTop="80dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:textColor="@android:color/white"
                 android:visibility="@{viewModel.mutableMessageVisibility ? View.VISIBLE: View.GONE}"
+                app:layout_constraintVertical_bias="0.3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/recyclerView"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <ProgressBar
                 android:id="@+id/user_list_progress_bar"
@@ -78,8 +60,4 @@
                 app:layout_constraintVertical_bias="0.3" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </LinearLayout>
-
-</androidx.core.widget.NestedScrollView>
-</layout>
+    </layout>

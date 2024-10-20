@@ -9,7 +9,7 @@ class UserListItemViewModel:
 
         val mutableUserName = MutableLiveData<String>()
         val mutableName = MutableLiveData<String>()
-        val mutableProgressVisibility = MutableLiveData<Boolean>()
+        val mutableProgressVisibility = MutableLiveData<Boolean>(false)
 
         fun initialize(user: User){
             mutableUserName.value= user.username ?: ""
