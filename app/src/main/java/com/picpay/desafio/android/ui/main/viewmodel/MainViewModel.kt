@@ -8,9 +8,6 @@ import com.picpay.desafio.android.PicPayService
 import com.picpay.desafio.android.model.User
 import com.picpay.desafio.android.ui.main.adapter.UserListAdapter
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainViewModel(private val service: PicPayService): ViewModel() {
     val adapter = UserListAdapter()
@@ -78,10 +75,10 @@ class MainViewModel(private val service: PicPayService): ViewModel() {
     }
 
     sealed class MainViewState<out T> {
-        object Recreated : MainViewState<Nothing>()
-        object Loading : MainViewState<Nothing>()
+        data object Recreated : MainViewState<Nothing>()
+        data object Loading : MainViewState<Nothing>()
         data class Success<out T>(val data: T) : MainViewState<T>()
         data class Error(val message: String?) : MainViewState<Nothing>()
-        object Empty : MainViewState<Nothing>()
+        data object Empty : MainViewState<Nothing>()
     }
 }

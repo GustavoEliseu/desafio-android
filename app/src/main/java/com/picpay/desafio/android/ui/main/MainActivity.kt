@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         }else{
             viewModel.initialize()
         }
-
     }
 
     override fun onResume() {
