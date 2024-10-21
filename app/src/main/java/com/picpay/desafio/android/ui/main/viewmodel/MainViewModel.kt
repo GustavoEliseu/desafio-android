@@ -49,23 +49,22 @@ class MainViewModel(private val service: PicPayService): ViewModel() {
     }
 
     private fun getUsers(){
-        service.getUsers()
-            .enqueue(object : Callback<List<User>> {
-                override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                    _viewState.value = MainViewState.Error(t.localizedMessage ?: t.message ?: "")
+        viewModelScope.launch {
+            service.getUsers()
+            try {
+                val response = service.getUsers()
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    _viewState.value = if (body.isNullOrEmpty()) MainViewState.Empty else MainViewState.Success(body)
+                } else {
+                    _viewState.value = MainViewState.Empty
                 }
-
-                override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                    val code = response.code()
-                    if(code == 200) {
-                        val body = response.body()
-                        _viewState.value = if(body.isNullOrEmpty()) MainViewState.Empty else MainViewState.Success(body)
-                    } else{
-                        _viewState.value = MainViewState.Empty
-                    }
-                }
-            })
+            } catch (e: Exception) {
+                _viewState.value = MainViewState.Error(e.localizedMessage ?: e.message ?: "")
+            }
+        }
     }
+
     private fun setRecyclerViewVisibility(visible: Boolean){
         mutableRecyclerVisibility.value = visible
     }

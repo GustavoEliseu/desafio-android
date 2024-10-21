@@ -1,19 +1,37 @@
 package com.picpay.desafio.android.di
 
+import android.content.Context
 import com.picpay.desafio.android.PicPayService
+import com.picpay.desafio.android.util.hasNetwork
+import okhttp3.Cache
 import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 
 val networkModule = module {
-    single { provideOkHttpClient() }
+    single { provideOkHttpClient(androidContext()) }
     single { provideRetrofit(get(), getProperty("baseUrl")) }
     single { providePicPayService(get()) }
 }
 
-private fun provideOkHttpClient(): OkHttpClient {
+private fun provideOkHttpClient(context: Context): OkHttpClient {
+    val cacheSize = 5L * 1024 * 1024
+    val cacheDir = File(context.cacheDir, "http_cache")
+    val cache = Cache(cacheDir, cacheSize)
+
     return OkHttpClient.Builder()
+        .cache(cache)
+        .addInterceptor { chain ->
+            var request = chain.request()
+            request = if (hasNetwork(context))
+                request.newBuilder().header("Cache-Control", "public, max-age=" + 60).build()
+            else
+                request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24).build()
+            chain.proceed(request)
+        }
         .build()
 }
 
