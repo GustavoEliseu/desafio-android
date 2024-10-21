@@ -1,4 +1,4 @@
-package com.picpay.desafio.android
+package com.picpay.desafio.android.main
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
@@ -9,7 +9,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
-import com.picpay.desafio.android.RecyclerViewMatchers.checkRecyclerViewItem
+import com.picpay.desafio.android.R
+import com.picpay.desafio.android.util.RecyclerViewMatchers.checkRecyclerViewItem
 import com.picpay.desafio.android.modules.provideOkHttpClient
 import com.picpay.desafio.android.modules.providePicPayService
 import com.picpay.desafio.android.ui.main.MainActivity

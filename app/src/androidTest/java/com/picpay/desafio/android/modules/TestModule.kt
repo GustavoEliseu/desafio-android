@@ -1,11 +1,9 @@
 package com.picpay.desafio.android.modules
 
-import com.picpay.desafio.android.PicPayService
+import com.picpay.desafio.android.data.api.PicPayService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.mockwebserver.MockWebServer
-import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

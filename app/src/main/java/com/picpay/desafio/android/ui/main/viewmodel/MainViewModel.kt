@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.picpay.desafio.android.PicPayService
-import com.picpay.desafio.android.model.User
+import com.picpay.desafio.android.domain.model.User
+import com.picpay.desafio.android.domain.usecase.GetUserListUseCase
 import com.picpay.desafio.android.ui.main.adapter.UserListAdapter
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val service: PicPayService): ViewModel() {
-    val adapter = UserListAdapter()
+class MainViewModel(private val getUserListUseCase: GetUserListUseCase): ViewModel() {
+    val adapter:UserListAdapter = UserListAdapter()
     val mutableRecyclerVisibility = MutableLiveData<Boolean>()
     val mutableMessageVisibility = MutableLiveData<Boolean>()
     val mutableLoadingVisibility = MutableLiveData<Boolean>()
@@ -33,10 +33,10 @@ class MainViewModel(private val service: PicPayService): ViewModel() {
     }
 
     fun updateUsers(users:List<User> = listOf(), recreated:Boolean = false){
-        if(!recreated) adapter.users = users
+        if(!recreated) adapter.setUsers(users)
         setLoadingVisibility(false)
-        setRecyclerViewVisibility(adapter.users.isNotEmpty())
-        setMessageVisibility(adapter.users.isEmpty())
+        setRecyclerViewVisibility(adapter.isNotEmpty())
+        setMessageVisibility(adapter.isEmpty())
     }
 
     fun updateRequestError(){
@@ -47,17 +47,11 @@ class MainViewModel(private val service: PicPayService): ViewModel() {
 
     private fun getUsers(){
         viewModelScope.launch {
-            service.getUsers()
-            try {
-                val response = service.getUsers()
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    _viewState.value = if (body.isNullOrEmpty()) MainViewState.Empty else MainViewState.Success(body)
-                } else {
-                    _viewState.value = MainViewState.Empty
-                }
-            } catch (e: Exception) {
-                _viewState.value = MainViewState.Error(e.localizedMessage ?: e.message ?: "")
+            val result = getUserListUseCase.execute()
+            result.onSuccess { users ->
+                _viewState.value = if (users.isEmpty()) MainViewState.Empty else MainViewState.Success(users)
+            }.onFailure { error ->
+                _viewState.value = MainViewState.Error(error.localizedMessage ?: error.message ?: "")
             }
         }
     }

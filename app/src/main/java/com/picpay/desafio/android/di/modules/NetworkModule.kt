@@ -1,7 +1,9 @@
-package com.picpay.desafio.android.di
+package com.picpay.desafio.android.di.modules
 
 import android.content.Context
-import com.picpay.desafio.android.PicPayService
+import com.picpay.desafio.android.data.api.PicPayService
+import com.picpay.desafio.android.data.repository.UserRepositoryImpl
+import com.picpay.desafio.android.domain.repository.UserRepository
 import com.picpay.desafio.android.util.hasNetwork
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -15,6 +17,7 @@ val networkModule = module {
     single { provideOkHttpClient(androidContext()) }
     single { provideRetrofit(get(), getProperty("baseUrl")) }
     single { providePicPayService(get()) }
+    single<UserRepository> { UserRepositoryImpl(get()) }
 }
 
 private fun provideOkHttpClient(context: Context): OkHttpClient {

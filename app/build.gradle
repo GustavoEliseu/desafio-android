@@ -93,8 +93,10 @@ dependencies {
     implementation "de.hdodenhof:circleimageview:$circleimageview_version"
 
     testImplementation "junit:junit:$junit_version"
-    testImplementation "org.mockito:mockito-core:$mockito_version"
-    implementation "org.mockito:mockito-android:$mockito_version"
+    testImplementation("org.mockito:mockito-core:$mockito_version" )
+    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockito_kotlin_version")
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
+
 
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.1'
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker:2.28.1'
@@ -105,6 +107,8 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
     androidTestImplementation("androidx.test.espresso:espresso-intents:$espresso_version")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:$espresso_version")
-    androidTestImplementation("androidx.test:core-ktx:$core_ktx_test_version")
+    androidTestImplementation "androidx.test:core-ktx:$core_ktx_test_version"
+    testImplementation("org.robolectric:robolectric:4.9.2")
+
     androidTestImplementation("org.hamcrest:hamcrest:3.0")
 }

@@ -6,23 +6,33 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.picpay.desafio.android.R
-import com.picpay.desafio.android.UserListDiffCallback
 import com.picpay.desafio.android.databinding.ListItemUserBinding
-import com.picpay.desafio.android.model.User
+import com.picpay.desafio.android.domain.model.User
 
-class UserListAdapter : RecyclerView.Adapter<UserListItemViewHolder>() {
+class UserListAdapter() : RecyclerView.Adapter<UserListItemViewHolder>() {
 
-    var users = emptyList<User>()
-        set(value) {
-            val result = DiffUtil.calculateDiff(
-                UserListDiffCallback(
-                    field,
-                    value
-                )
-            )
-            result.dispatchUpdatesTo(this)
-            field = value
-        }
+    private var _users = emptyList<User>()
+
+    // Update users and notify the adapter of the changes
+    fun setUsers(newUsers: List<User>) {
+        val diffResult = DiffUtil.calculateDiff(UserListDiffCallback(_users, newUsers))
+        _users = newUsers
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+
+    fun getUsers(): List<User>{
+        return _users
+    }
+
+    fun isEmpty():Boolean{
+        return _users.isEmpty()
+    }
+
+    fun isNotEmpty():Boolean{
+        return _users.isNotEmpty()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserListItemViewHolder {
         val databinding = DataBindingUtil.inflate<ListItemUserBinding>(
             LayoutInflater.from(parent.context),
@@ -34,8 +44,8 @@ class UserListAdapter : RecyclerView.Adapter<UserListItemViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: UserListItemViewHolder, position: Int) {
-        holder.bind(users[position])
+        holder.bind(_users[position])
     }
 
-    override fun getItemCount(): Int = users.size
+    override fun getItemCount(): Int = _users.size
 }

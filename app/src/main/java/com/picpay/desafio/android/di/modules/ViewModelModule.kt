@@ -1,6 +1,5 @@
-package com.picpay.desafio.android.di
+package com.picpay.desafio.android.di.modules
 
-import androidx.lifecycle.SavedStateHandle
 import com.picpay.desafio.android.ui.main.viewmodel.MainViewModel
 import org.koin.dsl.module
 
