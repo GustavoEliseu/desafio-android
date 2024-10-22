@@ -1,9 +1,10 @@
 # Desafio PicPay - Explicação da solução
 
 Devido ao meu tempo disponível, optei por uma abordagem mista. Realizei uma implementação parcial de melhorias e testes e gostaria de apresentar e discutir melhorias durante a entrevista.
-Por se tratar de um código legado o código foi tratado como se fosse um projeto maior, como se tivesse mais telas do que as que estão disponíveis. Por este motivo evitei mudanças drásticas nas dependencias afim de evitar possíveis conflitos. Sendo atualizadas apenas dependencias como Kotlin e Gradle, que são necessárias para modificar versão do targetSDK. Também foram atualizadas bibliotecas que não afetariam o projeto como um todo, como OkHTTP e bibliotecas de testes.
+Por se tratar de um código legado o código foi tratado como se fosse um projeto maior, com mais telas do que as que estão disponíveis. Por este motivo evitei mudanças drásticas nas dependencias afim de evitar possíveis conflitos, por este motivo bibliotecas não utilizadas como RXJava e RXAndroid não foram removidas. Sendo atualizadas apenas dependencias como Kotlin e Gradle, que são necessárias para modificar versão do targetSDK. Também foram atualizadas bibliotecas que não afetariam o projeto como um todo, como OkHTTP e bibliotecas de testes.
 
 O que foi realizado:
+- Correção nas regras do proguard para garantir que a versão release funcione
 - Atualizadas bibliotecas necessárias para que o projeto tenha como targetSdk versões mais recentes do android.(Necessário para publicação)
 - Reestruturação de arquivos e pastas do projeto, para garantir que não fique confuso com o crescimento do número de arquivos.
 - Substituição do Callback por coroutine, para garantir um vinculo melhor com o lifecycle
