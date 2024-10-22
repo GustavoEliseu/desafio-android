@@ -1,3 +1,32 @@
+# Desafio PicPay - Explicação da solução
+
+Devido ao meu tempo disponível, optei por uma abordagem mista. Realizei uma implementação parcial de melhorias e testes e gostaria de apresentar e discutir melhorias durante a entrevista.
+Por se tratar de um código legado o código foi tratado como se fosse um projeto maior, como se tivesse mais telas do que as que estão disponíveis. Por este motivo evitei mudanças drásticas nas dependencias afim de evitar possíveis conflitos. Sendo atualizadas apenas dependencias como Kotlin e Gradle, que são necessárias para modificar versão do targetSDK. Também foram atualizadas bibliotecas que não afetariam o projeto como um todo, como OkHTTP e bibliotecas de testes.
+
+O que foi realizado:
+- Atualizadas bibliotecas necessárias para que o projeto tenha como targetSdk versões mais recentes do android.(Necessário para publicação)
+- Reestruturação de arquivos e pastas do projeto, para garantir que não fique confuso com o crescimento do número de arquivos.
+- Substituição do Callback por coroutine, para garantir um vinculo melhor com o lifecycle
+- Remoção do NestedScrollView para evitar conflitos com o RecyclerView, garantindo um scroll fluido e o mantém estado do scroll ao reconstruir a tela. (Existem outras abordagens para esta solução, que dependem das regras de exibição do titulo/toolbar)
+- Adição de ViewModel para separar regras de negócio e exibição da MainActivity, também foi utilizado para manter os dados da lista durante uma reconstrução de tela.
+- Cacheamento de dados direto pelo OkHttp.(opção simples mas limitada, discutiremos opções melhores dependendo das regras. ex:Room)
+- Separação das regras de exibição e negócio, com adição de viewModel, UseCase e Repository.
+- Adicionados exemplos de testes unitários e utilitários, podemos discutir como mais testes seriam realizados.
+
+Bibliotecas adicionadas:
+- Atualizados caminhos de dependencia Koin, Mockito previamente não utilizadas
+- Adicionado Robolectric para testes
+- Adicionadas novas dependencias do espresso para testes
+- Adicionado caminho mavenCentral() para dependencias mais recentes, jcenter foi mantido
+- Substituição do plugin kotlin-android-extensions, pelo kotlin-parcelize (estava deprecated)
+
+Possíveis melhorias:
+- Mover lógica da tela contatos para um fragment ou componetizar, a fim de uma reutilização mais fácil
+- Modularização do projeto deve ser discutida
+- Testes mais profundos, como testes de api(dependem de internet), da MainActivity e testes de comportamento do recyclerView (estados, loading etc...)
+- Remoção de código deprecated de ambos os gradles
+- Possível migração de novas telas para compose
+
 # PicPay - Desafio Android
 
 <img src="https://github.com/mobilepicpay/desafio-android/blob/master/desafio-picpay.gif" width="300"/>
