@@ -66,6 +66,7 @@ class MainActivityTest : KoinTest {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
         checkRecyclerViewItem(R.id.recyclerView,0, withText("Sandrine Spinka"))
+        onView(withId(R.id.user_list_progress_bar)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         onView(withId(R.id.recyclerView)).check( { view, noViewFoundException ->
             val adapter = (view as? RecyclerView)?.adapter
             val itemCount = adapter?.itemCount
@@ -81,6 +82,7 @@ class MainActivityTest : KoinTest {
 
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         checkRecyclerViewItem(R.id.recyclerView,0,isDisplayed())
+        onView(withId(R.id.user_list_progress_bar)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         checkRecyclerViewItem(R.id.recyclerView,1, withText("Carli Carroll"))
         scenario.close()
     }
@@ -90,7 +92,7 @@ class MainActivityTest : KoinTest {
         server.enqueue(errorResponse)
 
         val scenario = ActivityScenario.launch(MainActivity::class.java)
-
+        onView(withId(R.id.user_list_progress_bar)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         onView(withId(R.id.recyclerView)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
             )
         )
@@ -105,7 +107,7 @@ class MainActivityTest : KoinTest {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
         onView(withId(R.id.recyclerView)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
-
+        onView(withId(R.id.user_list_progress_bar)).check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         onView(withText(emptyMessage)).check(matches(isDisplayed()))
         scenario.close()
     }
